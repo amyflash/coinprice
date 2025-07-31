@@ -1,36 +1,40 @@
-name: Fetch and Post Prices
+name: fetch and post price
 
 on:
   schedule:
-    # 使用 cron 语法，例如每小时执行一次
-    - cron: '0 * * * *'   # 每小时整点执行
-  workflow_dispatch:      # 允许手动触发
-    inputs:
-      logLevel:
-        description: '日志级别'
-        required: false
-        default: 'info'
+    - cron: "*/30 * * * *" # 每 30 分钟运行一次
+  workflow_dispatch:
+
+# 添加权限设置
+permissions:
+  contents: write
 
 jobs:
-  run-script:
+  crawl:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: "3.9"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run script
-        run: python fetch_and_post_prices.py
+      - name: Run crawler
+        env:
+          GITHUB_ACTIONS: true
+        run: python main.py
 
-      - name: Log completion
-        run: echo "定时任务执行完成"
+      - name: Commit and push if changes
+        run: |
+          git config --global user.name 'harrietlq'
+          git config --global user.email 'flashaq@hotmail.com'
+          git add -A
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto update by GitHub Actions at $(TZ=Asia/Shanghai date)" && git push)
