@@ -1,0 +1,36 @@
+name: Fetch and Post Prices
+
+on:
+  schedule:
+    # 使用 cron 语法，例如每小时执行一次
+    - cron: '0 * * * *'   # 每小时整点执行
+  workflow_dispatch:      # 允许手动触发
+    inputs:
+      logLevel:
+        description: '日志级别'
+        required: false
+        default: 'info'
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run script
+        run: python fetch_and_post_prices.py
+
+      - name: Log completion
+        run: echo "定时任务执行完成"
