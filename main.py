@@ -83,10 +83,10 @@ def send_wechat_message(webhook_url, markdown_content):
 # 使用示例
 def main():
     logger.info("任务开始执行...")
-    prices = fetch_prices()
+    prices = 1#fetch_prices()
     fg = fetch_fg()
     if prices:
-        markdown_msg = generate_markdown(prices,fg)
+        markdown_msg = fg#generate_markdown(prices,fg)
         success = send_wechat_message(webhook_url, markdown_msg)
         if success:
             logger.info("任务执行成功！")
