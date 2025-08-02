@@ -53,12 +53,7 @@ def generate_markdown(prices,fg):
         "## 当前市场btc价格概览\n" +
         "| 交易所 | 价格 (USDT) |\n" +
         "| --- | ---: |\n" +
-        f"| Binance | ${prices.get('binance', 'N/A')} |\n" +
-        f"| Bybit | ${prices.get('bybit', 'N/A')} |\n" +
         f"| OKX | ${prices['okx']} |\n" +
-        f"| Bitget | ${prices['bitget']} |\n" +
-        f"| Upbit | ${prices['upbit']} |\n" +
-        f"| Gate | ${prices['gate']} |\n" +
        "\n*数据更新时间: {}*".format(bj_now.strftime("%Y-%m-%d %H:%M 北京时间"))
     )
     
