@@ -120,7 +120,7 @@ def generate_markdown(fg):
         print(f"错误: {prices['error']}")
     else:
         for coin, price in prices.items():
-            pall +=f("{coin.upper()}: ${price}")
+            pall += f"{coin.upper()}: ${price}\n"
 
     markdown_content = (
         "## 当前市场汇率:" +fg+"\n"+
