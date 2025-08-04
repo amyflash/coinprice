@@ -3,6 +3,59 @@ import time
 import logging
 from datetime import datetime, timedelta
 from typing import Optional
+from typing import Dict, Union
+
+class CryptoPriceFetcher:
+    def __init__(self, api_key: str):
+        self.base_url = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest"
+        self.headers = {
+            'Accepts': 'application/json',
+            'X-CMC_PRO_API_KEY': api_key
+        }
+    
+    def fetch_prices(self) -> Dict[str, Union[float, str]]:
+        """获取8种主流加密货币的实时价格"""
+        params = {
+            'symbol': 'BTC,AVAX,AR,BNB,POL,ETH,BONK,SOL',
+            'convert': 'USD'
+        }
+        
+        try:
+            response = requests.get(
+                self.base_url,
+                params=params,
+                headers=self.headers,
+                timeout=10
+            )
+            response.raise_for_status()
+            
+            data = response.json()
+            return self._parse_prices(data)
+            
+        except requests.exceptions.RequestException as e:
+            return {'error': f"API请求失败: {str(e)}"}
+        except (KeyError, IndexError, ValueError) as e:
+            return {'error': f"数据解析错误: {str(e)}"}
+    
+    def _parse_prices(self, data: dict) -> Dict[str, float]:
+        """解析API返回的价格数据"""
+        coins = {
+            'BTC': ('BTC', 3),
+            'ETH': ('ETH', 3),
+            'BNB': ('BNB', 3),
+            'SOL': ('SOL', 10),
+            'AVAX': ('AVAX', 3),
+            'AR': ('AR', 3),
+            'POL': ('POL', 3),
+            'BONK': ('BONK', 10)
+        }
+        
+        result = {}
+        for coin, (symbol, precision) in coins.items():
+            price = data['data'][symbol][0]['quote']['USD']['price']
+            result[coin.lower()] = round(price, precision)
+        
+        return result
 
 def get_exchange_rate(
     api_key: str,
@@ -53,37 +106,6 @@ logger = logging.getLogger(__name__)
 #FETCH_URL = "https://crypto-api-vqm0.onrender.com/btc-prices"
 webhook_url = "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=0060472f-9759-40d1-8c57-560f9acfeb21"
 #F2_URL = "https://crypto-api-vqm0.onrender.com/fear-greed"
-
-def fetch_prices():
-    try:
-        logger.info(f"正在从 {FETCH_URL} 获取价格数据...")
-        response = requests.get(FETCH_URL, timeout=10)
-        response.raise_for_status()  # 检查 HTTP 错误
-        data = response.json()
-        logger.info(f"成功获取数据: {data}")
-        return data
-    except requests.exceptions.RequestException as e:
-        logger.error(f"请求失败: {e}")
-        return None
-    except ValueError as e:
-        logger.error(f"JSON 解析失败: {e}")
-        return None
-        
-def fetch_fg():
-    try:
-        logger.info(f"正在从 {F2_URL} 获取价格数据...")
-        response = requests.get(F2_URL, timeout=10)
-        response.raise_for_status()  # 检查 HTTP 错误
-        data = response.json()
-        logger.info(f"成功获取数据: {data}")
-        return data
-    except requests.exceptions.RequestException as e:
-        logger.error(f"请求失败: {e}")
-        return None
-    except ValueError as e:
-        logger.error(f"JSON 解析失败: {e}")
-        return None
-
 
 def generate_markdown(fg):
     # 获取当前时间并转换为北京时间(UTC+8)
