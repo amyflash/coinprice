@@ -123,7 +123,7 @@ def generate_markdown(fg):
             pall += f"{coin.upper()}: ${price}\n"
 
     markdown_content = (
-        "## 当前市场汇率:" +fg+"\n"+
+        "## " +fg+"\n"+
         "## 当前市场价格概览\n" +pall+"\n" +
        "\n*数据更新时间: {}*".format(bj_now.strftime("%Y-%m-%d %H:%M 北京时间"))
     )
